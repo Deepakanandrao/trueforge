@@ -7,6 +7,7 @@ from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.jsonable_encoder import encode_path_param
+from ..core.pagination import AsyncPager, SyncPager
 from ..core.parse_error import ParsingError
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -24,7 +25,9 @@ from ..types.list_schedule_runs_response import ListScheduleRunsResponse
 from ..types.list_schedules_response import ListSchedulesResponse
 from ..types.request_error_response import RequestErrorResponse
 from ..types.resource_name import ResourceName
+from ..types.schedule import Schedule
 from ..types.schedule_manifest import ScheduleManifest
+from ..types.schedule_run import ScheduleRun
 from pydantic import ValidationError
 
 # this is used as the default value for optional parameters
@@ -43,7 +46,7 @@ class RawSchedulesClient:
         agent_names: typing.Optional[str] = None,
         created_by_me: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[ListSchedulesResponse]:
+    ) -> SyncPager[Schedule, ListSchedulesResponse]:
         """
         List schedules for the tenant, newest first.
 
@@ -66,7 +69,7 @@ class RawSchedulesClient:
 
         Returns
         -------
-        HttpResponse[ListSchedulesResponse]
+        SyncPager[Schedule, ListSchedulesResponse]
             Paginated matching schedules.
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -82,14 +85,27 @@ class RawSchedulesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListSchedulesResponse,
                     construct_type(
                         type_=ListSchedulesResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return HttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+                    _get_next = lambda: self.list(
+                        limit=limit,
+                        page_token=_parsed_next,
+                        agent_names=agent_names,
+                        created_by_me=created_by_me,
+                        request_options=request_options,
+                    )
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),
@@ -564,7 +580,7 @@ class RawSchedulesClient:
         limit: typing.Optional[int] = 25,
         page_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[ListScheduleRunsResponse]:
+    ) -> SyncPager[ScheduleRun, ListScheduleRunsResponse]:
         """
         List runs of a schedule, newest `scheduled_for` first. Available to its creator or a manager of its agent.
 
@@ -584,7 +600,7 @@ class RawSchedulesClient:
 
         Returns
         -------
-        HttpResponse[ListScheduleRunsResponse]
+        SyncPager[ScheduleRun, ListScheduleRunsResponse]
             Paginated runs of the schedule.
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -598,14 +614,26 @@ class RawSchedulesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListScheduleRunsResponse,
                     construct_type(
                         type_=ListScheduleRunsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return HttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+                    _get_next = lambda: self.list_runs(
+                        schedule_id=schedule_id,
+                        limit=limit,
+                        page_token=_parsed_next,
+                        request_options=request_options,
+                    )
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),
@@ -661,7 +689,7 @@ class AsyncRawSchedulesClient:
         agent_names: typing.Optional[str] = None,
         created_by_me: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[ListSchedulesResponse]:
+    ) -> AsyncPager[Schedule, ListSchedulesResponse]:
         """
         List schedules for the tenant, newest first.
 
@@ -684,7 +712,7 @@ class AsyncRawSchedulesClient:
 
         Returns
         -------
-        AsyncHttpResponse[ListSchedulesResponse]
+        AsyncPager[Schedule, ListSchedulesResponse]
             Paginated matching schedules.
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -700,14 +728,30 @@ class AsyncRawSchedulesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListSchedulesResponse,
                     construct_type(
                         type_=ListSchedulesResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return AsyncHttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+
+                    async def _get_next():
+                        return await self.list(
+                            limit=limit,
+                            page_token=_parsed_next,
+                            agent_names=agent_names,
+                            created_by_me=created_by_me,
+                            request_options=request_options,
+                        )
+
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),
@@ -1182,7 +1226,7 @@ class AsyncRawSchedulesClient:
         limit: typing.Optional[int] = 25,
         page_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[ListScheduleRunsResponse]:
+    ) -> AsyncPager[ScheduleRun, ListScheduleRunsResponse]:
         """
         List runs of a schedule, newest `scheduled_for` first. Available to its creator or a manager of its agent.
 
@@ -1202,7 +1246,7 @@ class AsyncRawSchedulesClient:
 
         Returns
         -------
-        AsyncHttpResponse[ListScheduleRunsResponse]
+        AsyncPager[ScheduleRun, ListScheduleRunsResponse]
             Paginated runs of the schedule.
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1216,14 +1260,29 @@ class AsyncRawSchedulesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListScheduleRunsResponse,
                     construct_type(
                         type_=ListScheduleRunsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return AsyncHttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+
+                    async def _get_next():
+                        return await self.list_runs(
+                            schedule_id=schedule_id,
+                            limit=limit,
+                            page_token=_parsed_next,
+                            request_options=request_options,
+                        )
+
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),

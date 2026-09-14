@@ -3,6 +3,7 @@
 import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
+from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
 from ..types.create_schedule_run_response import CreateScheduleRunResponse
 from ..types.delete_schedule_response import DeleteScheduleResponse
@@ -10,7 +11,9 @@ from ..types.get_schedule_response import GetScheduleResponse
 from ..types.list_schedule_runs_response import ListScheduleRunsResponse
 from ..types.list_schedules_response import ListSchedulesResponse
 from ..types.resource_name import ResourceName
+from ..types.schedule import Schedule
 from ..types.schedule_manifest import ScheduleManifest
+from ..types.schedule_run import ScheduleRun
 from .raw_client import AsyncRawSchedulesClient, RawSchedulesClient
 
 # this is used as the default value for optional parameters
@@ -40,7 +43,7 @@ class SchedulesClient:
         agent_names: typing.Optional[str] = None,
         created_by_me: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListSchedulesResponse:
+    ) -> SyncPager[Schedule, ListSchedulesResponse]:
         """
         List schedules for the tenant, newest first.
 
@@ -63,7 +66,7 @@ class SchedulesClient:
 
         Returns
         -------
-        ListSchedulesResponse
+        SyncPager[Schedule, ListSchedulesResponse]
             Paginated matching schedules.
 
         Examples
@@ -74,16 +77,20 @@ class SchedulesClient:
             token="YOUR_TOKEN",
             base_url="https://yourhost.com/path/to/api",
         )
-        client.schedules.list()
+        response = client.schedules.list()
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
-        _response = self._raw_client.list(
+        return self._raw_client.list(
             limit=limit,
             page_token=page_token,
             agent_names=agent_names,
             created_by_me=created_by_me,
             request_options=request_options,
         )
-        return _response.data
 
     def create(
         self,
@@ -291,7 +298,7 @@ class SchedulesClient:
         limit: typing.Optional[int] = 25,
         page_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListScheduleRunsResponse:
+    ) -> SyncPager[ScheduleRun, ListScheduleRunsResponse]:
         """
         List runs of a schedule, newest `scheduled_for` first. Available to its creator or a manager of its agent.
 
@@ -311,7 +318,7 @@ class SchedulesClient:
 
         Returns
         -------
-        ListScheduleRunsResponse
+        SyncPager[ScheduleRun, ListScheduleRunsResponse]
             Paginated runs of the schedule.
 
         Examples
@@ -322,14 +329,18 @@ class SchedulesClient:
             token="YOUR_TOKEN",
             base_url="https://yourhost.com/path/to/api",
         )
-        client.schedules.list_runs(
+        response = client.schedules.list_runs(
             schedule_id="schedule_id",
         )
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
-        _response = self._raw_client.list_runs(
+        return self._raw_client.list_runs(
             schedule_id=schedule_id, limit=limit, page_token=page_token, request_options=request_options
         )
-        return _response.data
 
 
 class AsyncSchedulesClient:
@@ -355,7 +366,7 @@ class AsyncSchedulesClient:
         agent_names: typing.Optional[str] = None,
         created_by_me: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListSchedulesResponse:
+    ) -> AsyncPager[Schedule, ListSchedulesResponse]:
         """
         List schedules for the tenant, newest first.
 
@@ -378,7 +389,7 @@ class AsyncSchedulesClient:
 
         Returns
         -------
-        ListSchedulesResponse
+        AsyncPager[Schedule, ListSchedulesResponse]
             Paginated matching schedules.
 
         Examples
@@ -394,19 +405,24 @@ class AsyncSchedulesClient:
 
 
         async def main() -> None:
-            await client.schedules.list()
+            response = await client.schedules.list()
+            async for item in response:
+                yield item
+
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.list(
+        return await self._raw_client.list(
             limit=limit,
             page_token=page_token,
             agent_names=agent_names,
             created_by_me=created_by_me,
             request_options=request_options,
         )
-        return _response.data
 
     async def create(
         self,
@@ -656,7 +672,7 @@ class AsyncSchedulesClient:
         limit: typing.Optional[int] = 25,
         page_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListScheduleRunsResponse:
+    ) -> AsyncPager[ScheduleRun, ListScheduleRunsResponse]:
         """
         List runs of a schedule, newest `scheduled_for` first. Available to its creator or a manager of its agent.
 
@@ -676,7 +692,7 @@ class AsyncSchedulesClient:
 
         Returns
         -------
-        ListScheduleRunsResponse
+        AsyncPager[ScheduleRun, ListScheduleRunsResponse]
             Paginated runs of the schedule.
 
         Examples
@@ -692,14 +708,19 @@ class AsyncSchedulesClient:
 
 
         async def main() -> None:
-            await client.schedules.list_runs(
+            response = await client.schedules.list_runs(
                 schedule_id="schedule_id",
             )
+            async for item in response:
+                yield item
+
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.list_runs(
+        return await self._raw_client.list_runs(
             schedule_id=schedule_id, limit=limit, page_token=page_token, request_options=request_options
         )
-        return _response.data

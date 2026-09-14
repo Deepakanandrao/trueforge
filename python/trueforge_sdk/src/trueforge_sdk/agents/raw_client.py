@@ -7,6 +7,7 @@ from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.jsonable_encoder import encode_path_param
+from ..core.pagination import AsyncPager, SyncPager
 from ..core.parse_error import ParsingError
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -16,6 +17,7 @@ from ..errors.conflict_error import ConflictError
 from ..errors.not_found_error import NotFoundError
 from ..errors.unauthorized_error import UnauthorizedError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.agent import Agent
 from ..types.agent_spec import AgentSpec
 from ..types.delete_agent_response import DeleteAgentResponse
 from ..types.get_agent_response import GetAgentResponse
@@ -39,7 +41,7 @@ class RawAgentsClient:
         page_token: typing.Optional[str] = None,
         agent_name: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[ListAgentsResponse]:
+    ) -> SyncPager[Agent, ListAgentsResponse]:
         """
         List configured agents for the tenant, ordered by name. Optional `agent_name` filters by substring.
 
@@ -59,7 +61,7 @@ class RawAgentsClient:
 
         Returns
         -------
-        HttpResponse[ListAgentsResponse]
+        SyncPager[Agent, ListAgentsResponse]
             Paginated matching agents.
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -74,14 +76,26 @@ class RawAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListAgentsResponse,
                     construct_type(
                         type_=ListAgentsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return HttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+                    _get_next = lambda: self.list(
+                        limit=limit,
+                        page_token=_parsed_next,
+                        agent_name=agent_name,
+                        request_options=request_options,
+                    )
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),
@@ -434,7 +448,7 @@ class AsyncRawAgentsClient:
         page_token: typing.Optional[str] = None,
         agent_name: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[ListAgentsResponse]:
+    ) -> AsyncPager[Agent, ListAgentsResponse]:
         """
         List configured agents for the tenant, ordered by name. Optional `agent_name` filters by substring.
 
@@ -454,7 +468,7 @@ class AsyncRawAgentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[ListAgentsResponse]
+        AsyncPager[Agent, ListAgentsResponse]
             Paginated matching agents.
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -469,14 +483,29 @@ class AsyncRawAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _data = typing.cast(
+                _parsed_response = typing.cast(
                     ListAgentsResponse,
                     construct_type(
                         type_=ListAgentsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                return AsyncHttpResponse(response=_response, data=_data)
+                _items = _parsed_response.data
+                _has_next = False
+                _get_next = None
+                if _parsed_response.pagination is not None:
+                    _parsed_next = _parsed_response.pagination.next_page_token
+                    _has_next = _parsed_next is not None and _parsed_next != ""
+
+                    async def _get_next():
+                        return await self.list(
+                            limit=limit,
+                            page_token=_parsed_next,
+                            agent_name=agent_name,
+                            request_options=request_options,
+                        )
+
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next, response=_parsed_response)
             if _response.status_code == 400:
                 raise BadRequestError(
                     headers=dict(_response.headers),

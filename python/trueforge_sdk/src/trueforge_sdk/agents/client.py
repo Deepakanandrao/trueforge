@@ -3,7 +3,9 @@
 import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
+from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
+from ..types.agent import Agent
 from ..types.agent_spec import AgentSpec
 from ..types.delete_agent_response import DeleteAgentResponse
 from ..types.get_agent_response import GetAgentResponse
@@ -37,7 +39,7 @@ class AgentsClient:
         page_token: typing.Optional[str] = None,
         agent_name: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListAgentsResponse:
+    ) -> SyncPager[Agent, ListAgentsResponse]:
         """
         List configured agents for the tenant, ordered by name. Optional `agent_name` filters by substring.
 
@@ -57,7 +59,7 @@ class AgentsClient:
 
         Returns
         -------
-        ListAgentsResponse
+        SyncPager[Agent, ListAgentsResponse]
             Paginated matching agents.
 
         Examples
@@ -68,12 +70,16 @@ class AgentsClient:
             token="YOUR_TOKEN",
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.list()
+        response = client.agents.list()
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
-        _response = self._raw_client.list(
+        return self._raw_client.list(
             limit=limit, page_token=page_token, agent_name=agent_name, request_options=request_options
         )
-        return _response.data
 
     def create(
         self,
@@ -262,7 +268,7 @@ class AsyncAgentsClient:
         page_token: typing.Optional[str] = None,
         agent_name: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListAgentsResponse:
+    ) -> AsyncPager[Agent, ListAgentsResponse]:
         """
         List configured agents for the tenant, ordered by name. Optional `agent_name` filters by substring.
 
@@ -282,7 +288,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        ListAgentsResponse
+        AsyncPager[Agent, ListAgentsResponse]
             Paginated matching agents.
 
         Examples
@@ -298,15 +304,20 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.list()
+            response = await client.agents.list()
+            async for item in response:
+                yield item
+
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.list(
+        return await self._raw_client.list(
             limit=limit, page_token=page_token, agent_name=agent_name, request_options=request_options
         )
-        return _response.data
 
     async def create(
         self,
