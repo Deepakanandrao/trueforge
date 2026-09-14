@@ -109,7 +109,7 @@ groups:
           location: local-file-system
           path: ../../python/trueforge_sdk
         config:
-          # Import name; PyPI install trueforge-sdk resolves via PEP 503.
+          # Import + upload name. pip install trueforge-sdk resolves via PEP 503.
           package_name: trueforge_sdk
           optional_auth: true
           stream_abstraction: true

@@ -126,8 +126,11 @@ jobs:
 
       # Same entrypoint as local `pnpm sdk:generate` (re-runs openapi:write; idempotent).
       # App-token success = we can push; forks skip Fern so a flake cannot block the PR.
+      # FERN_TOKEN is required so Python list() emits SyncPager (Fern README already documents it).
       - name: Generate OpenAPI document and SDKs
         if: steps.decide.outputs.needed == 'true' && steps.app-token.outcome == 'success'
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
         run: pnpm sdk:generate
 
       # App-token success = writable head; forks cannot receive this commit.
@@ -154,7 +157,7 @@ jobs:
           # Bot-authored sdk diffs need a changeset; the PR author never touches this commit.
           # Skip packages/trueforge-sdk/.fern — Fern metadata only, not a consumer-facing change.
           # changeset:sdk-regen is a no-op if the sdk is already named in a pending file.
-          # Python is not Changesets-published yet; do not add it here.
+          # Python version mirrors TS on Version Packages; do not add a Python changeset here.
           if [ -n "$(git status --porcelain -- packages/trueforge-sdk ':!packages/trueforge-sdk/.fern')" ]; then
             pnpm changeset:sdk-regen
           fi
