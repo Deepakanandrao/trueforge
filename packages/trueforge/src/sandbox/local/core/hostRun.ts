@@ -126,8 +126,19 @@ export const SRT_HOST_BINARIES_BY_PLATFORM = {
   darwin: [],
 } as const satisfies Record<LocalSandboxPlatform, readonly string[]>;
 
+/** PATH executable → package name for install / support messages. */
+export const SRT_HOST_BINARY_LABELS: Readonly<Record<string, string>> = {
+  bwrap: 'bubblewrap',
+  socat: 'socat',
+  rg: 'ripgrep',
+};
+
 export function srtHostBinaryNames(platform: LocalSandboxPlatform): readonly string[] {
   return SRT_HOST_BINARIES_BY_PLATFORM[platform];
+}
+
+export function srtHostBinaryLabel(executable: string): string {
+  return SRT_HOST_BINARY_LABELS[executable] ?? executable;
 }
 
 /** SRT's own host-dep check (bwrap/socat/rg on Linux). Does not require initSrt. */
