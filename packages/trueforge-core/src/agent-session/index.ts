@@ -9,6 +9,7 @@ export type { AgentSpec, Skill } from './schemas/agentSpec';
 export {
   CancellationReason,
   CreateTurnRequestSchema,
+  TurnInboundEventItemSchema,
   TurnInputItemSchema,
   TurnMetricsSchema,
   TurnSchema,
@@ -19,7 +20,14 @@ export {
   TurnStateRunningSchema,
   TurnStateSchema,
 } from './schemas/turn';
-export type { TerminalTurnState, Turn, TurnInputItem, TurnMetrics, TurnState } from './schemas/turn';
+export type {
+  TerminalTurnState,
+  Turn,
+  TurnInboundEventItem,
+  TurnInputItem,
+  TurnMetrics,
+  TurnState,
+} from './schemas/turn';
 
 export {
   SessionMetadataSchema,
@@ -80,6 +88,7 @@ export type {
   GetSessionInput,
   GetTurnInput,
   ISessionStore,
+  InsertTurnInboundEventsInput,
   ListSessionEventsInput,
   ListSessionsInput,
   ListTurnEventsInput,
@@ -105,6 +114,7 @@ export {
   SessionStoreInvariantError,
   SessionStoreNotFoundError,
   TurnAlreadyExistsError,
+  TurnEventAlreadyExistsError,
   TurnNotFoundError,
   TurnNotRunningError,
 } from './store/SessionStoreErrors';

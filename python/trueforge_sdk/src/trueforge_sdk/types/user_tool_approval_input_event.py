@@ -8,7 +8,7 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 from .approval_decision import ApprovalDecision
 
 
-class UserToolApprovalEvent(UncheckedBaseModel):
+class UserToolApprovalInputEvent(UncheckedBaseModel):
     approval: ApprovalDecision
     thread_id: str = pydantic.Field()
     """

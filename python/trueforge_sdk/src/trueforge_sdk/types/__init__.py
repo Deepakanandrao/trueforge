@@ -243,8 +243,8 @@ if typing.TYPE_CHECKING:
     from .user_message import UserMessage
     from .user_message_content import UserMessageContent
     from .user_message_content_item import UserMessageContentItem
-    from .user_tool_approval_event import UserToolApprovalEvent
-    from .user_tool_response_event import UserToolResponseEvent
+    from .user_tool_approval_input_event import UserToolApprovalInputEvent
+    from .user_tool_response_input_event import UserToolResponseInputEvent
     from .web_search_capability import WebSearchCapability
     from .web_search_config import WebSearchConfig
     from .web_search_provider_manifest import WebSearchProviderManifest
@@ -487,8 +487,8 @@ _dynamic_imports: typing.Dict[str, str] = {
     "UserMessage": ".user_message",
     "UserMessageContent": ".user_message_content",
     "UserMessageContentItem": ".user_message_content_item",
-    "UserToolApprovalEvent": ".user_tool_approval_event",
-    "UserToolResponseEvent": ".user_tool_response_event",
+    "UserToolApprovalInputEvent": ".user_tool_approval_input_event",
+    "UserToolResponseInputEvent": ".user_tool_response_input_event",
     "WebSearchCapability": ".web_search_capability",
     "WebSearchConfig": ".web_search_config",
     "WebSearchProviderManifest": ".web_search_provider_manifest",
@@ -755,8 +755,8 @@ __all__ = [
     "UserMessage",
     "UserMessageContent",
     "UserMessageContentItem",
-    "UserToolApprovalEvent",
-    "UserToolResponseEvent",
+    "UserToolApprovalInputEvent",
+    "UserToolResponseInputEvent",
     "WebSearchCapability",
     "WebSearchConfig",
     "WebSearchProviderManifest",

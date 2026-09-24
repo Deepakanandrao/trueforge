@@ -5,9 +5,9 @@ import * as core from "../../core/index.js";
 import type * as serializers from "../index.js";
 import { ApprovalDecision } from "./ApprovalDecision.js";
 
-export const UserToolApprovalEvent: core.serialization.ObjectSchema<
-    serializers.UserToolApprovalEvent.Raw,
-    TrueForge.UserToolApprovalEvent
+export const UserToolApprovalInputEvent: core.serialization.ObjectSchema<
+    serializers.UserToolApprovalInputEvent.Raw,
+    TrueForge.UserToolApprovalInputEvent
 > = core.serialization.object({
     approval: ApprovalDecision,
     threadId: core.serialization.property("thread_id", core.serialization.string()),
@@ -15,7 +15,7 @@ export const UserToolApprovalEvent: core.serialization.ObjectSchema<
     type: core.serialization.stringLiteral("user.tool_approval"),
 });
 
-export declare namespace UserToolApprovalEvent {
+export declare namespace UserToolApprovalInputEvent {
     export interface Raw {
         approval: ApprovalDecision.Raw;
         thread_id: string;

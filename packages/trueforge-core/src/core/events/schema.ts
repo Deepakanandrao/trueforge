@@ -85,7 +85,7 @@ export const UserToolApprovalMessageSchema = z
     tool_call_id: z.string().min(1, 'tool_call_id is required').describe('Tool call id being approved or denied.'),
     approval: ApprovalDecisionSchema,
   })
-  .openapi('UserToolApprovalEvent');
+  .openapi('UserToolApprovalInputEvent');
 
 export const UserToolResponseMessageSchema = z
   .object({
@@ -94,7 +94,7 @@ export const UserToolResponseMessageSchema = z
     tool_call_id: z.string().min(1, 'tool_call_id is required').describe('Tool call id receiving the client response.'),
     content: z.string().min(1, 'content cannot be empty').describe('Client-side tool result content.'),
   })
-  .openapi('UserToolResponseEvent');
+  .openapi('UserToolResponseInputEvent');
 
 export const TextContentPartSchema = z
   .object({

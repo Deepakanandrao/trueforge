@@ -4,9 +4,9 @@ import type * as TrueForge from "../../api/index.js";
 import * as core from "../../core/index.js";
 import type * as serializers from "../index.js";
 
-export const UserToolResponseEvent: core.serialization.ObjectSchema<
-    serializers.UserToolResponseEvent.Raw,
-    TrueForge.UserToolResponseEvent
+export const UserToolResponseInputEvent: core.serialization.ObjectSchema<
+    serializers.UserToolResponseInputEvent.Raw,
+    TrueForge.UserToolResponseInputEvent
 > = core.serialization.object({
     content: core.serialization.string(),
     threadId: core.serialization.property("thread_id", core.serialization.string()),
@@ -14,7 +14,7 @@ export const UserToolResponseEvent: core.serialization.ObjectSchema<
     type: core.serialization.stringLiteral("user.tool_response"),
 });
 
-export declare namespace UserToolResponseEvent {
+export declare namespace UserToolResponseInputEvent {
     export interface Raw {
         content: string;
         thread_id: string;
