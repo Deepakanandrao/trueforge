@@ -2831,6 +2831,105 @@ client.sessions.list_turn_events(
 </dl>
 </details>
 
+<details><summary><code>client.sessions.<a href="src/trueforge_sdk/sessions/client.py">create_turn_event</a>(...) -> CreateTurnEventResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create events for a turn. Only the session creator may create them.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from trueforge_sdk import TrueForge, UserToolApprovalInputEvent, ApprovalAllow
+
+client = TrueForge(
+    token="<token>",
+    base_url="https://yourhost.com/path/to/api",
+)
+
+client.sessions.create_turn_event(
+    session_id="session_id",
+    turn_id="turn_id",
+    events=[
+        UserToolApprovalInputEvent(
+            approval=ApprovalAllow(
+                status="allow",
+            ),
+            thread_id="thread_id",
+            tool_call_id="tool_call_id",
+            type="user.tool_approval",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**session_id:** `str` — Session identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**turn_id:** `str` — Turn identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**events:** `typing.List[TurnInboundEventItem]` — One or more events (`user.tool_approval`, `user.tool_response`, `user.tool_approval_policy`).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.sessions.<a href="src/trueforge_sdk/sessions/client.py">subscribe_to_turn</a>(...) -> typing.Iterator[bytes]</code></summary>
 <dl>
 <dd>
